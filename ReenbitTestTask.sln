@@ -5,6 +5,8 @@ VisualStudioVersion = 17.8.34330.188
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReenbitBlobTriggerFunction", "ReenbitBlobTriggerFunction\ReenbitBlobTriggerFunction.csproj", "{5B3108F2-4A0E-4740-8B06-91960AA5BC29}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReenbitTestTask", "ReenbitTestTask\ReenbitTestTask.csproj", "{42B44688-AED2-4F0C-BAC6-4FDFE7F583D4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{5B3108F2-4A0E-4740-8B06-91960AA5BC29}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5B3108F2-4A0E-4740-8B06-91960AA5BC29}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5B3108F2-4A0E-4740-8B06-91960AA5BC29}.Release|Any CPU.Build.0 = Release|Any CPU
+		{42B44688-AED2-4F0C-BAC6-4FDFE7F583D4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{42B44688-AED2-4F0C-BAC6-4FDFE7F583D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{42B44688-AED2-4F0C-BAC6-4FDFE7F583D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{42B44688-AED2-4F0C-BAC6-4FDFE7F583D4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
