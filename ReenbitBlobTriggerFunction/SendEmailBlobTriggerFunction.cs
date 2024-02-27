@@ -6,9 +6,9 @@ using Microsoft.Extensions.Logging;
 
 namespace ReenbitBlobTriggerFunction
 {
-    public class Function1
+    public class SendEmailBlobTriggerFunction
     {
-        [FunctionName("Function1")]
+        [FunctionName("SendEmailBlobTriggerFunction")]
         public void Run([BlobTrigger("reenbitblobcontainer/{name}", Connection = "ReenbitStorage")]Stream myBlob, string name, ILogger log)
         {
             log.LogInformation($"C# Blob trigger function Processed blob\n Name:{name} \n Size: {myBlob.Length} Bytes");
