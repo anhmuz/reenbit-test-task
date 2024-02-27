@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "ReenbitBlobTriggerFunction": {
+      "commandName": "Project",
+      "commandLineArgs": "--port 7243",
+      "launchBrowser": false
+    }
+  }
+}
