@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using ReenbitTestTask.Data;
 using ReenbitTestTask.Models;
+using Microsoft.Extensions.Azure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +12,11 @@ builder.Services.Configure<AzureStorageConfig>(builder.Configuration.GetSection(
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddSingleton<WeatherForecastService>();
+builder.Services.AddAzureClients(clientBuilder =>
+{
+    clientBuilder.AddBlobServiceClient(builder.Configuration["1:blob"], preferMsi: true);
+    clientBuilder.AddQueueServiceClient(builder.Configuration["1:queue"], preferMsi: true);
+});
 
 var app = builder.Build();
 

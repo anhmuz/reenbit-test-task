@@ -12,9 +12,10 @@ namespace ReenbitTestTask.Pages
         {
             await Context.CreateDocument(new Models.Document
             {
-                Name = "fooname3",
+                Name = "fooname",
                 Content = "fooContent"
             });
         }
     }
 }
+ 
