@@ -4,30 +4,45 @@ using Azure.Storage.Blobs;
 using Azure.Storage.Sas;
 using Azure.Storage;
 using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
-using System.Reflection.Metadata;
+using SendGrid.Helpers.Mail;
+using SendGrid;
+using System.Threading.Tasks;
 
 namespace ReenbitBlobTriggerFunction
 {
     public class SendEmailBlobTriggerFunction
     {
         [FunctionName("SendEmailBlobTriggerFunction")]
-        public void Run([BlobTrigger("reenbitblobcontainer/{name}", Connection = "AzureWebJobsStorage")]Stream myBlob, string name, ILogger log)
+        public static async Task Run([BlobTrigger("reenbitblobcontainer/{name}", Connection = "AzureWebJobsStorage")]Stream myBlob,
+            string name, ILogger log)
         {
             log.LogInformation($"C# Blob trigger function Processed blob\n Name:{name} \n Size: {myBlob.Length} Bytes");
 
             var storageConnectionString = Environment.GetEnvironmentVariable("AzureWebJobsStorage");
+            var apiKey = Environment.GetEnvironmentVariable("SendGridApiKey");
 
             try
             {
                 var url = generateFileUrlWithBlobSasToken(storageConnectionString, "reenbitblobcontainer", name);
 
                 log.LogInformation($"SAS blob Uri: {url}");
+
+                var client = new SendGridClient(apiKey);
+                var message = new SendGridMessage()
+                {
+                    From = new EmailAddress("anhelina.muzychenko@gmail.com", "Anhelina Muzychenko"),
+                    Subject = "File Uploaded Successfully",
+                    PlainTextContent = $"<p>The file has been uploaded successfully. Here is the link: <a href='{url}'>{url}</a></p>"
+                };
+                message.AddTo(new EmailAddress("*****"));
+
+                var response = await client.SendEmailAsync(message);
+
+                log.LogInformation(response.IsSuccessStatusCode ? "Email sent successfully!" : "Something went wrong!");
             } 
-            catch (Exception ex)  
+            catch (Exception ex)
             {
                 log.LogError($"Error occured while processing Blob {name}, Exception - {ex.InnerException}");
             }
