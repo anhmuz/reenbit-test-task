@@ -7,7 +7,7 @@ namespace ReenbitTestTask.Helpers;
 
 public static class StorageHelper
 {
-    static public async Task UploadBlob(string accountName, string containerName, string blobName, string blobContent)
+    static public async Task UploadBlob(string accountName, string containerName, string blobName, string blobContent, string email)
     {
         // Construct the blob container endpoint from the arguments.
         string containerEndpoint = string.Format("https://{0}.blob.core.windows.net/{1}",
@@ -22,18 +22,23 @@ public static class StorageHelper
 
         //BlobContainerClient containerClient = new BlobContainerClient(new Uri(containerEndpoint),
         //                                                                           new VisualStudioCredential());
+        
+        Dictionary<string, string> blobMetadata = new();
 
         try
         {
             // Create the container if it does not exist.
             await containerClient.CreateIfNotExistsAsync();
 
+            var blobClient = containerClient.GetBlobClient(blobName);
+
             // Upload text to a new block blob.
             byte[] byteArray = Encoding.ASCII.GetBytes(blobContent);
+            blobMetadata.Add("email", email);
 
-            using (MemoryStream stream = new MemoryStream(byteArray))
+            using (var stream = new MemoryStream(byteArray))
             {
-                await containerClient.UploadBlobAsync(blobName, stream);
+                await blobClient.UploadAsync(stream, null, blobMetadata, null, null, null);
             }
         }
         catch (Exception e)

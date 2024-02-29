@@ -10,11 +10,13 @@ namespace ReenbitTestTask.Pages
 
         public async Task Upload()
         {
+            string email = "anhelina.muzychenko@gmail.com";
             await Context.CreateDocument(new Models.Document
             {
-                Name = "fooname1",
-                Content = "fooContent"
-            });
+                Name = "fooname3",
+                Content = "fooContent3"
+            },
+            email);
         }
     }
 }

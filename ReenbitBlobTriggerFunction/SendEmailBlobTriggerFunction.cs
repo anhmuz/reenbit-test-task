@@ -9,6 +9,8 @@ using System.Collections.Generic;
 using SendGrid.Helpers.Mail;
 using SendGrid;
 using System.Threading.Tasks;
+using Microsoft.WindowsAzure.Storage.Blob;
+using Microsoft.WindowsAzure.Storage;
 
 namespace ReenbitBlobTriggerFunction
 {
@@ -36,7 +38,9 @@ namespace ReenbitBlobTriggerFunction
                     Subject = "File Uploaded Successfully",
                     PlainTextContent = $"<p>The file has been uploaded successfully. Here is the link: <a href='{url}'>{url}</a></p>"
                 };
-                message.AddTo(new EmailAddress("*****"));
+
+                var email = await getEmailFromBlobMetadata(storageConnectionString, "reenbitblobcontainer", name);
+                message.AddTo(new EmailAddress(email));
 
                 var response = await client.SendEmailAsync(message);
 
@@ -46,6 +50,16 @@ namespace ReenbitBlobTriggerFunction
             {
                 log.LogError($"Error occured while processing Blob {name}, Exception - {ex.InnerException}");
             }
+        }
+
+        private static async Task<string> getEmailFromBlobMetadata(string storageConnectionString, string container, string blobName)
+        {
+            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(storageConnectionString);
+            CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
+            CloudBlobContainer blobContainer = blobClient.GetContainerReference(container);
+            CloudBlockBlob blob = blobContainer.GetBlockBlobReference(blobName);
+            await blob.FetchAttributesAsync();
+            return blob.Metadata["email"];
         }
 
         private static string generateFileUrlWithBlobSasToken(string storageConnectionString, string container, string blobName)
