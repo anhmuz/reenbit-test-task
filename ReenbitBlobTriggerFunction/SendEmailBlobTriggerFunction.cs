@@ -6,11 +6,12 @@ using Azure.Storage;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
-using SendGrid.Helpers.Mail;
-using SendGrid;
 using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage.Blob;
 using Microsoft.WindowsAzure.Storage;
+using System.Net.Mail;
+using System.Net;
+
 
 namespace ReenbitBlobTriggerFunction
 {
@@ -23,33 +24,48 @@ namespace ReenbitBlobTriggerFunction
             log.LogInformation($"C# Blob trigger function Processed blob\n Name:{name} \n Size: {myBlob.Length} Bytes");
 
             var storageConnectionString = Environment.GetEnvironmentVariable("AzureWebJobsStorage");
-            var apiKey = Environment.GetEnvironmentVariable("SendGridApiKey");
-
+  
             try
             {
                 var url = generateFileUrlWithBlobSasToken(storageConnectionString, "reenbitblobcontainer", name);
-
                 log.LogInformation($"SAS blob Uri: {url}");
 
-                var client = new SendGridClient(apiKey);
-                var message = new SendGridMessage()
+                string subject = "File Uploaded Successfully";
+                string content = $"<p>The file has been uploaded successfully. Here is the <a href='{url}'>link</a></p>";
+                string emailTo = await getEmailFromBlobMetadata(storageConnectionString, "reenbitblobcontainer", name);
+
+                try
                 {
-                    From = new EmailAddress("anhelina.muzychenko@gmail.com", "Anhelina Muzychenko"),
-                    Subject = "File Uploaded Successfully",
-                    PlainTextContent = $"<p>The file has been uploaded successfully. Here is the link: <a href='{url}'>{url}</a></p>"
-                };
-
-                var email = await getEmailFromBlobMetadata(storageConnectionString, "reenbitblobcontainer", name);
-                message.AddTo(new EmailAddress(email));
-
-                var response = await client.SendEmailAsync(message);
-
-                log.LogInformation(response.IsSuccessStatusCode ? "Email sent successfully!" : "Something went wrong!");
+                    sendEmail(emailTo, subject, content);
+                    log.LogInformation("Email sent successfully");
+                }
+                catch (Exception ex)
+                {
+                    log.LogError($"Email cannot be sent: {ex.Message}");
+                }
             } 
             catch (Exception ex)
             {
                 log.LogError($"Error occured while processing Blob {name}, Exception - {ex.InnerException}");
             }
+        }
+
+        private static void sendEmail(string emailTo, string subject, string content)
+        {
+            string emailLogin = Environment.GetEnvironmentVariable("GmailLogin");
+            string password = Environment.GetEnvironmentVariable("GmailPassword");
+
+            MailMessage mailMessage = new MailMessage(emailLogin, emailTo, subject, content)
+            {
+                IsBodyHtml = true
+            };
+            SmtpClient smtpClient = new SmtpClient("smtp.gmail.com", 587)
+            {
+                EnableSsl = true,
+                UseDefaultCredentials = false,
+                Credentials = new NetworkCredential(emailLogin, password)
+            };
+            smtpClient.Send(mailMessage);
         }
 
         private static async Task<string> getEmailFromBlobMetadata(string storageConnectionString, string container, string blobName)
