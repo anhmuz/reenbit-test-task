@@ -7,7 +7,7 @@ namespace ReenbitTestTask.Helpers;
 
 public static class StorageHelper
 {
-    static public async Task UploadBlob(string accountName, string containerName, string blobName, string blobContent, string email)
+    static public async Task UploadBlob(string accountName, string containerName, string blobName, byte[] blobContent, string email)
     {
         // Construct the blob container endpoint from the arguments.
         string containerEndpoint = string.Format("https://{0}.blob.core.windows.net/{1}",
@@ -32,11 +32,9 @@ public static class StorageHelper
 
             var blobClient = containerClient.GetBlobClient(blobName);
 
-            // Upload text to a new block blob.
-            byte[] byteArray = Encoding.ASCII.GetBytes(blobContent);
             blobMetadata.Add("email", email);
 
-            using (var stream = new MemoryStream(byteArray))
+            using (var stream = new MemoryStream(blobContent))
             {
                 await blobClient.UploadAsync(stream, null, blobMetadata, null, null, null);
             }
@@ -99,11 +97,9 @@ public static class StorageHelper
                     bytes = stream.ToArray();
                 }
 
-                string txt = new string(Encoding.ASCII.GetString(bytes));
-
                 DocumentBlobDTO blobDTO;
                 blobDTO.Name = blob.Name;
-                blobDTO.Content = txt;
+                blobDTO.Content = bytes;
                 blobs.Add(blobDTO);
             }
         }
@@ -119,5 +115,5 @@ public static class StorageHelper
 public struct DocumentBlobDTO
 {
     public string Name;
-    public string Content;
+    public byte[] Content;
 }

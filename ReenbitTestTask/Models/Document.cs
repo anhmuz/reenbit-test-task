@@ -4,5 +4,5 @@ public class Document
 {
     public string Name { get; set; } = default!;
 
-    public string Content { get; set; } = default!;
+    public byte[] Content { get; set; } = default!;
 }

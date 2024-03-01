@@ -1,5 +1,7 @@
 ﻿using ReenbitTestTask.Data;
 using Microsoft.AspNetCore.Components;
+using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Components.Forms;
 
 namespace ReenbitTestTask.Pages
 {
@@ -8,15 +10,43 @@ namespace ReenbitTestTask.Pages
         [Inject]
         public DocumentsContext Context { get; set; } = default!;
 
-        public async Task Upload()
+        [EmailAddress]
+        public string Email { get; set; } = default!;
+
+        private bool _disableButton => !IsValidEmail(Email);
+
+        private static bool IsValidEmail(string email)
         {
-            string email = "anhelina.muzychenko@gmail.com";
+            try
+            {
+                var addr = new System.Net.Mail.MailAddress(email);
+                return addr.Address == email;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private async Task UploadFiles(IBrowserFile file)
+        {
+            if (file!.ContentType != "application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+            {
+                return;
+            }
+
+            using var ms = new MemoryStream();
+            await file.OpenReadStream().CopyToAsync(ms);
+            byte[] byteArray = ms.ToArray();
+
             await Context.CreateDocument(new Models.Document
             {
-                Name = "fooname3",
-                Content = "fooContent3"
+                Name = file.Name,
+                Content = byteArray
             },
-            email);
+            Email);
+
+            Email = default!;
         }
     }
 }

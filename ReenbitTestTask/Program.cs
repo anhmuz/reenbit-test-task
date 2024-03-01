@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Components.Web;
 using ReenbitTestTask.Data;
 using ReenbitTestTask.Models;
 using Microsoft.Extensions.Azure;
+using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +12,7 @@ builder.Services.AddTransient<DocumentsContext>();
 builder.Services.Configure<AzureStorageConfig>(builder.Configuration.GetSection("AzureStorageConfig"));
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
+builder.Services.AddMudServices();
 builder.Services.AddSingleton<WeatherForecastService>();
 builder.Services.AddAzureClients(clientBuilder =>
 {

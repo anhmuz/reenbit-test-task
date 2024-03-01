@@ -1,13 +1,15 @@
 ﻿@page "/"
 @using MudBlazor
+@using System.ComponentModel.DataAnnotations
 
-<PageTitle>Index</PageTitle>
+<PageTitle>ReenbitApp</PageTitle>
 
-<h1>Hello, world!</h1>
+<MudTextField T="string" @bind-Value="Email" Required="true" RequiredError="Email is required!" Placeholder="Email"
+    Validation="@(new EmailAddressAttribute() {ErrorMessage = "The email address is invalid!"})" />
 
-Welcome to your new app.
-
-<SurveyPrompt Title="How is Blazor working for you?" />
- 
-<MudButton OnClick="Upload">Upload</MudButton>
- 
+<MudFileUpload T="IBrowserFile" FilesChanged="UploadFiles">
+    <ButtonTemplate>
+        <MudButton HtmlTag="label" Variant="Variant.Filled" Disabled = "_disableButton"
+            StartIcon="@Icons.Material.Filled.CloudUpload" for="@context.Id">Upload Files</MudButton>
+    </ButtonTemplate>
+</MudFileUpload>
