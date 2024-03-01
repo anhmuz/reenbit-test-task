@@ -32,9 +32,9 @@ public class DocumentsContext
         return Documents;
     }
 
-    public async Task CreateDocument(Document Document, string email)
+    public async Task CreateDocument(Document document, string email)
     {
-        await StorageHelper.UploadBlob(_config.AccountName, _config.ContainerName, Document.Name, Document.Content, email);
+        await StorageHelper.UploadBlob(_config.AccountName, _config.ContainerName, document.Name, document.Content, email);
     }
 
     public async Task DeleteDocument(Document Document)
